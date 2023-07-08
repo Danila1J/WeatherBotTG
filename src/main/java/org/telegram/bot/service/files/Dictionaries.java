@@ -1,4 +1,4 @@
-package org.example;
+package org.telegram.bot.service.files;
 
 import java.util.HashMap;
 import java.util.Map;

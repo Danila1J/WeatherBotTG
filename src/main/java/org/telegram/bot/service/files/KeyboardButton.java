@@ -1,4 +1,4 @@
-package org.example;
+package org.telegram.bot.service.files;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -9,13 +9,15 @@ import java.util.List;
 
 public class KeyboardButton {
     // Варианты выбора категории
-    public static final InlineKeyboardMarkup InlineKeyboardChooseCategory = createInlineKeyboard("Погода", "WeatherApp","Расписание электричек", "TabletimeFrom");
+    public static final InlineKeyboardMarkup InlineKeyboardChooseCategory = createInlineKeyboard("Погода", "WeatherApp","Расписание электричек", "TabletimeFrom","Маршруты", "Routes");
 
     // Варианты выбора города
     public static final InlineKeyboardMarkup InlineKeyboardChooseCity = createInlineKeyboard("Самара", "WeatherSamara","Новокуйбышевск", "WeatherNovokybishevsk");
 
     // Варианты выбора станции отправления
     public static final InlineKeyboardMarkup InlineKeyboardChooseDeparture = createInlineKeyboard("Cамара", "FromSamara","Мирная", "FromMirnaya","Липяги", "FromLipyagi","Средневолжская", "FromSrednevolzhskaya");
+
+
 
     // Варианты выбора станции прибытия (для Самары)
     public static final InlineKeyboardMarkup InlineKeyboardChooseArrivalSamara = createInlineKeyboard("Мирная", "ToMirnaya","Липяги", "ToLipyagi","Средневолжская", "ToSrednevolzhskaya");
@@ -28,6 +30,11 @@ public class KeyboardButton {
 
     // Варианты выбора станций прибытия (для Средневолжской)
     public static final InlineKeyboardMarkup InlineKeyboardChooseArrivalSrednevolzhskaya = createInlineKeyboard("Cамара", "ToSamara","Мирная", "ToMirnaya","Липяги", "ToLipyagi");
+
+
+
+    // Варианты выбора маршрутов
+    public static final InlineKeyboardMarkup InlineKeyboardChooseRoutes = createInlineKeyboard("Телецентр -> Ж/Д", "Telecentre->Railway","Ж/Д -> Телецентр","Railway->Telecentre");
 
     private static InlineKeyboardMarkup createInlineKeyboard(String... buttons) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
