@@ -2,6 +2,7 @@ package org.telegram.bot.handlers;
 
 import org.telegram.bot.BotEngine;
 import org.telegram.bot.routes.Routes;
+import org.telegram.bot.service.files.Dictionaries;
 import org.telegram.bot.service.files.KeyboardButton;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
@@ -13,41 +14,46 @@ public class RouteHandler {
     private final BotEngine botEngine;
     private final MessageHandler messageHandler;
     private final Routes routes = new Routes();
+
     public RouteHandler(BotEngine botEngine, MessageHandler messageHandler) {
         this.botEngine = botEngine;
         this.messageHandler = messageHandler;
     }
 
-    private void processRouteDetails(String route, StringBuilder stringBuilder) throws TelegramApiException {
+    private void processRouteDetails(String route, StringBuilder stringBuilder) {
+        stringBuilder.append("Маршрут ").append(Dictionaries.routes.get(route));
         try {
             for (StringBuilder s : routes.getRouteDetails(route, botEngine.getChromeDriver())) {
                 stringBuilder.append(s);
             }
         } catch (Exception e) {
             // Если на выбранном маршруте нет транспорта, отправляем сообщение об этом
-            int idMessage = botEngine.execute(new SendMessage(botEngine.getChatId(), "На выбранном маршруте нет транспорта")).getMessageId();
-            messageHandler.deleteMessage(60, idMessage);
+            int idMessage;
+            try {
+                idMessage = botEngine.execute(new SendMessage(botEngine.getChatId(), "На выбранном маршруте нет транспорта")).getMessageId();
+            } catch (TelegramApiException ex) {
+                throw new RuntimeException("Failed to send exception message(На выбранном маршруте нет транспорта)", ex);
+            }
+            if(idMessage!=0) messageHandler.deleteMessage(60, idMessage);
         }
     }
+
     // Метод изменения/обновление сообщения в отдельном потоке
     private void runCodeInSeparateThread(String route, StringBuilder stringBuilder, int idScheduleRouteMessage) {
         CompletableFuture.runAsync(() -> {
             ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 
             Runnable task = () -> {
-                try {
-                    stringBuilder.setLength(0);
-                    processRouteDetails(route, stringBuilder);
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException(e);
-                }
+                stringBuilder.setLength(0);
+                processRouteDetails(route, stringBuilder);
+
                 EditMessageText editMessageText = new EditMessageText(stringBuilder.toString());
                 editMessageText.setChatId(botEngine.getChatId());
                 editMessageText.setMessageId(idScheduleRouteMessage);
                 try {
                     botEngine.execute(editMessageText);
-                } catch (TelegramApiException exception) {
-                    throw new RuntimeException(exception);
+                } catch (TelegramApiException e) {
+                    throw new RuntimeException("Failed to edit message",e);
                 }
             };
 
@@ -67,6 +73,7 @@ public class RouteHandler {
             executor.shutdown();
         });
     }
+
     public void sendRoute(String route) {
         StringBuilder stringBuilder = new StringBuilder();
         try {

@@ -1,4 +1,4 @@
-package json.rasp;
+package json.schedule;
 
 public class TransportSubtype {
     public String color;

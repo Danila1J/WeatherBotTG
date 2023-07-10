@@ -54,10 +54,8 @@ public class Dictionaries {
             "FromSrednevolzhskaya", "Средневолжская",
             "FromSamara", "Самара"
     );
-    public static Map<Double, String> Strength_rain = Map.of(
-            0.25, "слабый дождь",
-            0.5, "дождь",
-            0.75, "сильный дождь",
-            1.0, "сильный ливень"
+    public static final Map<String, String> routes = Map.of(
+            "Telecentre->Railway", "Телецентр -> Ж/Д",
+            "Railway->Telecentre", "Ж/Д -> Телецентр"
     );
 }

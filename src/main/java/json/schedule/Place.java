@@ -1,4 +1,4 @@
-package json.rasp;
+package json.schedule;
 
 public class Place {
     public String currency;

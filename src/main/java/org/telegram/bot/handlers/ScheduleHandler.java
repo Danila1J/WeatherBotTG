@@ -4,7 +4,6 @@ import org.telegram.bot.BotEngine;
 import org.telegram.bot.schedule.train.Schedule;
 import org.telegram.bot.service.files.KeyboardButton;
 import org.telegram.bot.service.files.Singleton;
-import org.telegram.bot.service.files.TimeOfDay;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
@@ -21,8 +20,8 @@ public class ScheduleHandler {
         StringBuilder stringBuilder = new StringBuilder();
         try {
             try {
-                Schedule.rasp(station1, station2);
-                stringBuilder.append(TimeOfDay.timeOfDay(botEngine.getUserName())).append("\n\nРасписание ").append(station1).append("🚂").append(" - ").append(station2).append("🚂").append("\n\n").append(Singleton.getInstance().getProperties().getStr());
+                new Schedule().train(station1, station2);
+                stringBuilder.append("Расписание ").append(station1).append("🚂").append(" - ").append(station2).append("🚂").append("\n\n").append(Singleton.getInstance().getProperties().getStr());
             } catch (Exception e) {
                 botEngine.execute(new SendMessage(botEngine.getChatId(), "На выбранном направлении нет электричек"));
             }

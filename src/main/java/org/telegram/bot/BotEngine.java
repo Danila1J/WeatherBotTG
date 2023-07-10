@@ -13,7 +13,6 @@ import static org.telegram.bot.service.files.Dictionaries.translatedCitiesMap;
 
 public class BotEngine extends TelegramLongPollingBot {
     private String chatId;
-    private String userName = "";
     private Integer firstMessageId;
 
     private final MessageHandler messageHandler;
@@ -32,7 +31,7 @@ public class BotEngine extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Погода для котиков";
+        return System.getProperty("botUsername");
     }
     public void onUpdateReceived(Update update) {
         if (update.hasMessage()) {
@@ -66,17 +65,11 @@ public class BotEngine extends TelegramLongPollingBot {
     public void setChatId(String chatId) {
         this.chatId = chatId;
     }
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
     public void setFirstMessageId(Integer firstMessageId) {
         this.firstMessageId = firstMessageId;
     }
     public String getChatId() {
         return chatId;
-    }
-    public String getUserName() {
-        return userName;
     }
     public Integer getFirstMessageId() {
         return firstMessageId;

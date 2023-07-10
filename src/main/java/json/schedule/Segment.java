@@ -1,4 +1,4 @@
-package json.rasp;
+package json.schedule;
 
 public class Segment {
     public String arrival;

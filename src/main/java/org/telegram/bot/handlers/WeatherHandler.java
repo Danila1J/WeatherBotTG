@@ -4,7 +4,6 @@ import org.telegram.bot.BotEngine;
 import org.telegram.bot.service.files.Dictionaries;
 import org.telegram.bot.service.files.KeyboardButton;
 import org.telegram.bot.service.files.Singleton;
-import org.telegram.bot.service.files.TimeOfDay;
 import org.telegram.bot.weather.DescriptionPrediction;
 import org.telegram.bot.weather.WeatherApp;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -27,19 +26,20 @@ public class WeatherHandler {
     public void sendWeatherMessage(String cityName) {
         Singleton.getInstance().getProperties().setNameCity(cityName);
         WeatherApp.displayWeatherInfo(cityName);
-        String weather = TimeOfDay.timeOfDay(botEngine.getUserName()) +
-                "\n\nСейчас на улице " + Singleton.getInstance().getProperties().getCondition() +
-                "\nТемпература в " + Dictionaries.declinationCityMap.get(cityName) + ": " + Math.round(Singleton.getInstance().getProperties().getTempOfCity()) +
-                " °C\nВетер " + Singleton.getInstance().getProperties().getWind() + " м/с" +
-                createWeatherStr(Singleton.getInstance().getProperties().getS()) + "\n\n" +
-                Singleton.getInstance().getProperties().getWeatherMessage();
+        StringBuilder weather = new StringBuilder()
+                .append("Сейчас на улице ").append(Singleton.getInstance().getProperties().getCondition())
+                .append("\nТемпература в ").append(Dictionaries.declinationCityMap.get(cityName)).append(": ").append(Math.round(Singleton.getInstance().getProperties().getTempOfCity()))
+                .append(" °C\nВетер ").append(Singleton.getInstance().getProperties().getWind()).append(" м/с")
+                .append(createWeatherStr(Singleton.getInstance().getProperties().getS())).append("\n\n")
+                .append(Singleton.getInstance().getProperties().getWeatherMessage());
         try {
-            int weather_message = botEngine.execute(new SendMessage(botEngine.getChatId(), weather)).getMessageId();  // Отправьте сообщение и получите его идентификатор
+            int weather_message = botEngine.execute(new SendMessage(botEngine.getChatId(), weather.toString())).getMessageId();  // Отправьте сообщение и получите его идентификатор
             messageHandler.deleteMessage(60, weather_message);
         } catch (TelegramApiException e) {
             throw new RuntimeException("Failed to send weather message", e);
         }
-        sendPrediction(cityName);
+        //TODO Нужна ли эта функция?
+        //sendPrediction(cityName);
         messageHandler.editInlineKeyBoardMessage("Выберите категорию", KeyboardButton.InlineKeyboardChooseCategory);
     }
 

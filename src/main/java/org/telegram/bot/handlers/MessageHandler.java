@@ -22,16 +22,14 @@ public class MessageHandler {
     }
 
     public void sendFirstMessage(Message message) {
-        botEngine.setUserName(message.getFrom().getFirstName());
         botEngine.setChatId(message.getChatId().toString());
         SendMessage sendMessage = new SendMessage(message.getChatId().toString(), "Выберите  категорию");
         sendMessage.setReplyMarkup(KeyboardButton.InlineKeyboardChooseCategory);
         try {
             botEngine.setFirstMessageId(botEngine.execute(sendMessage).getMessageId());
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to send first message",e);
         }
-        //sendInlineKeyBoardMessage("Выберите  категорию", KeyboardButton.InlineKeyboardChooseCategory);
     }
 
     public void deleteMessage(int delaySeconds, int idMessage) {
@@ -43,7 +41,7 @@ public class MessageHandler {
             try {
                 botEngine.execute(deleteMessage);
             } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Failed to delete message",e);
             }
         }, delaySeconds, TimeUnit.SECONDS);
 
@@ -58,7 +56,7 @@ public class MessageHandler {
         try {
             botEngine.execute(editMessageText);
         } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to edit InlineKeyBoard in message",e);
         }
     }
 }

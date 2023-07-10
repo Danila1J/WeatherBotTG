@@ -1,4 +1,4 @@
-package json.rasp;
+package json.schedule;
 
 public class Pagination {
     public int total;
