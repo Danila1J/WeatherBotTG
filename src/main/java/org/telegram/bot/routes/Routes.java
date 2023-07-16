@@ -1,10 +1,13 @@
 package org.telegram.bot.routes;
 
+import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.telegram.bot.ElementNotFoundException;
 import pages.AbstractPage;
 import pages.MainPage;
 import pages.to.samara.ArrivingTransportPage;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -26,9 +29,7 @@ public class Routes {
     }
 
     private void setup(ChromeDriver driver) {
-        //ChromeDriver driver = new ChromeDriver(); // Создание экземпляра драйвера
-        driver.manage().window().maximize(); // Устанавливаем размер окна браузера, как максимально возможный
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS); // Установим время ожидания для поиска элементов
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // Установим время ожидания для поиска элементов
         AbstractPage.setDriver(driver); // Установить созданный драйвер для поиска в веб-страницах
     }
 
@@ -39,7 +40,7 @@ public class Routes {
     }
 
     // Метод для настройки и использования драйвера
-    private StringBuilder[] useDriver(String url,ChromeDriver driver) {
+    private StringBuilder[] useDriver(String url,ChromeDriver driver) throws ElementNotFoundException {
         setup(driver);
         driver.get(url);
 
@@ -69,13 +70,13 @@ public class Routes {
         return temp;
     }
 
-    public StringBuilder[] getRouteDetails(String routeName,ChromeDriver driver) {
+    public StringBuilder[] getRouteDetails(String routeName,ChromeDriver driver) throws ElementNotFoundException {
         String url = getUrlByRouteName(routeName);
         return url.isEmpty() ? null : useDriver(url,driver);
     }
 
     //Получение маршрутов
-    private StringBuilder[] getRoutes(int amount, ArrivingTransportPage arrivingTransportPage) {
+    private StringBuilder[] getRoutes(int amount, ArrivingTransportPage arrivingTransportPage) throws ElementNotFoundException {
         StringBuilder[] answer = new StringBuilder[amount];
         int j = 0;
         for (int i = 0; j < amount; i++) {

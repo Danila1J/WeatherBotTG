@@ -1,6 +1,7 @@
 package org.telegram.bot.handlers;
 
 import org.telegram.bot.BotEngine;
+import org.telegram.bot.TrainsNotFoundException;
 import org.telegram.bot.schedule.train.Schedule;
 import org.telegram.bot.service.files.KeyboardButton;
 import org.telegram.bot.service.files.Singleton;
@@ -22,7 +23,7 @@ public class ScheduleHandler {
             try {
                 new Schedule().train(station1, station2);
                 stringBuilder.append("Расписание ").append(station1).append("🚂").append(" - ").append(station2).append("🚂").append("\n\n").append(Singleton.getInstance().getProperties().getStr());
-            } catch (Exception e) {
+            } catch (TrainsNotFoundException e) {
                 botEngine.execute(new SendMessage(botEngine.getChatId(), "На выбранном направлении нет электричек"));
             }
             int rasp_message = botEngine.execute(new SendMessage(botEngine.getChatId(), stringBuilder.toString())).getMessageId();

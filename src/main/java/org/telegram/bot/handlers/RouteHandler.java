@@ -1,6 +1,8 @@
 package org.telegram.bot.handlers;
 
+import org.openqa.selenium.WebDriverException;
 import org.telegram.bot.BotEngine;
+import org.telegram.bot.ElementNotFoundException;
 import org.telegram.bot.routes.Routes;
 import org.telegram.bot.service.files.Dictionaries;
 import org.telegram.bot.service.files.KeyboardButton;
@@ -8,7 +10,9 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class RouteHandler {
     private final BotEngine botEngine;
@@ -21,57 +25,42 @@ public class RouteHandler {
     }
 
     private void processRouteDetails(String route, StringBuilder stringBuilder) {
-        stringBuilder.append("Маршрут ").append(Dictionaries.routes.get(route));
+        stringBuilder.append("Маршрут ").append(Dictionaries.routes.get(route)).append("\n\n");
         try {
             for (StringBuilder s : routes.getRouteDetails(route, botEngine.getChromeDriver())) {
                 stringBuilder.append(s);
             }
-        } catch (Exception e) {
-            // Если на выбранном маршруте нет транспорта, отправляем сообщение об этом
+        } catch (WebDriverException e) {
+            throw new RuntimeException("Error accessing the browser driver");
+        } catch (ElementNotFoundException e) {
+            stringBuilder.setLength(0);// Удаление названия маршрута, т.к. на направлении нет транспорта
             int idMessage;
             try {
                 idMessage = botEngine.execute(new SendMessage(botEngine.getChatId(), "На выбранном маршруте нет транспорта")).getMessageId();
             } catch (TelegramApiException ex) {
                 throw new RuntimeException("Failed to send exception message(На выбранном маршруте нет транспорта)", ex);
             }
-            if(idMessage!=0) messageHandler.deleteMessage(60, idMessage);
+            if (idMessage != 0) messageHandler.deleteMessage(60, idMessage);
         }
     }
 
     // Метод изменения/обновление сообщения в отдельном потоке
     private void runCodeInSeparateThread(String route, StringBuilder stringBuilder, int idScheduleRouteMessage) {
-        CompletableFuture.runAsync(() -> {
-            ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+        Runnable task = () -> {
+            stringBuilder.setLength(0);
+            processRouteDetails(route, stringBuilder);
 
-            Runnable task = () -> {
-                stringBuilder.setLength(0);
-                processRouteDetails(route, stringBuilder);
-
-                EditMessageText editMessageText = new EditMessageText(stringBuilder.toString());
-                editMessageText.setChatId(botEngine.getChatId());
-                editMessageText.setMessageId(idScheduleRouteMessage);
-                try {
-                    botEngine.execute(editMessageText);
-                } catch (TelegramApiException e) {
-                    throw new RuntimeException("Failed to edit message",e);
-                }
-            };
-
-            ScheduledFuture<?> future = executor.scheduleAtFixedRate(task, 30, 30, TimeUnit.SECONDS);
-
-            // Ожидаем 5 минуты
+            EditMessageText editMessageText = new EditMessageText(stringBuilder.toString());
+            editMessageText.setChatId(botEngine.getChatId());
+            editMessageText.setMessageId(idScheduleRouteMessage);
             try {
-                Thread.sleep(5 * 60 * 1000);
-            } catch (InterruptedException e) {
-                // Обработка исключения
+                botEngine.execute(editMessageText);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException("Failed to edit message", e);
             }
-
-            // Отменяем выполнение задачи
-            future.cancel(true);
-
-            // Останавливаем пул потоков
-            executor.shutdown();
-        });
+        };
+        executor.scheduleAtFixedRate(task, 30, 30, TimeUnit.SECONDS);
     }
 
     public void sendRoute(String route) {

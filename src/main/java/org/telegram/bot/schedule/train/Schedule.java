@@ -1,6 +1,7 @@
 package org.telegram.bot.schedule.train;
 
 import com.google.gson.Gson;
+import org.telegram.bot.TrainsNotFoundException;
 import org.telegram.bot.service.files.Dictionaries;
 import org.telegram.bot.service.files.Properties;
 import org.telegram.bot.service.files.Singleton;
@@ -19,7 +20,7 @@ public class Schedule {
     private static final String API_KEY = System.getProperty("SCHEDULE_API_KEY");
     private final Properties properties = Singleton.getInstance().getProperties();
 
-    public void train(String departureStation, String arrivalStation) {
+    public void train(String departureStation, String arrivalStation) throws TrainsNotFoundException {
         String apiEndPoint = constructUrl(departureStation, arrivalStation, getCurrentDate());
         StringBuilder responseBuilder = properties.getStr();
 
@@ -36,8 +37,12 @@ public class Schedule {
             responseBuilder.append("Ближайших электричек на сегодня нет");
         }
 
-        properties.setName_from(schedule.segments.get(0).from.title);
-        properties.setName_to(schedule.segments.get(0).to.title);
+        try {
+            properties.setName_from(schedule.segments.get(0).from.title);
+            properties.setName_to(schedule.segments.get(0).to.title);
+        }catch (IndexOutOfBoundsException e){
+            throw new TrainsNotFoundException();
+        }
     }
 
     private String constructUrl(String departureStation, String arrivalStation, String date) {
