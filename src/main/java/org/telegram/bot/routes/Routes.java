@@ -1,6 +1,5 @@
 package org.telegram.bot.routes;
 
-import org.jetbrains.annotations.NotNull;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.telegram.bot.ElementNotFoundException;
 import pages.AbstractPage;
@@ -10,7 +9,6 @@ import pages.to.samara.ArrivingTransportPage;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class Routes {
 
