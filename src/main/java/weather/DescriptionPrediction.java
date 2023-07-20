@@ -5,6 +5,7 @@ import pages.AbstractPage;
 import pages.MainPage;
 import pages.yandex.weather.YandexWeatherPage;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,7 @@ public class DescriptionPrediction {
     private ChromeDriver setup() {
         ChromeDriver driver = new ChromeDriver(); // Создание экземпляра драйвера
         driver.manage().window().maximize(); // Устанавливаем размер окна браузера, как максимально возможный
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS); // Установим время ожидания для поиска элементов
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)); // Установим время ожидания для поиска элементов
         AbstractPage.setDriver(driver); // Установить созданный драйвер для поиска в веб-страницах
         return driver;
     }
