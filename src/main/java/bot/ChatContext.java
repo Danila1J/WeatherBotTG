@@ -1,5 +1,8 @@
 package bot;
 
+/**
+ * Класс ChatContext предназначен для хранения информации, связанной с чатом.
+ */
 public class ChatContext {
     private String chatId;
     private Integer firstMessageId;

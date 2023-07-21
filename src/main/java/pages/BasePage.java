@@ -11,7 +11,7 @@ public class BasePage extends AbstractPage {
         return new YandexWeatherPage(driver);
     }
 
-    public ArrivingTransportPage mainMenuTransport() {
+    public ArrivingTransportPage gotoArrivingTransports() {
         return new ArrivingTransportPage(driver);
     }
 }

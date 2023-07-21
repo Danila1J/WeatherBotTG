@@ -53,7 +53,7 @@ public class RouteHandler {
             throw new RuntimeException("Error accessing the browser driver");
         } catch (ElementNotFoundException e) {
             routeDetails.setLength(0); // Удаление названия маршрута, так как по направлению нет транспорта
-            sendThenDeleteMessageToUser("На выбранном маршруте нет транспорта", context, 60);
+            sendThenDeleteMessage("На выбранном маршруте нет транспорта", context, 60);
         }
     }
 
@@ -64,10 +64,10 @@ public class RouteHandler {
      * @param context Контекст чата.
      * @param delayInSeconds Задержка в секундах.
      */
-    private void sendThenDeleteMessageToUser(String messageText, ChatContext context, int delayInSeconds) {
+    private void sendThenDeleteMessage(String messageText, ChatContext context, int delayInSeconds) {
         try {
             int messageId = botEngine.execute(new SendMessage(context.getChatId(), messageText)).getMessageId();
-            if (messageId != 0) messageHandler.deleteMessage(delayInSeconds, messageId, context);
+            if (messageId != 0) messageHandler.deleteMessageAfterDelay(delayInSeconds, messageId, context);
         } catch (TelegramApiException e) {
             throw new RuntimeException("Failed to send exception message(" + messageText + ")", e);
         }
@@ -118,12 +118,12 @@ public class RouteHandler {
             regularlyUpdateMessageWithRouteDetails(route, routeDetailsBuilder, messageForScheduleId, context);
 
             // Удаление сообщения с маршрутом через 590 секунд
-            messageHandler.deleteMessage(590, messageForScheduleId, context);
+            messageHandler.deleteMessageAfterDelay(590, messageForScheduleId, context);
         } catch (TelegramApiException e) {
             throw new RuntimeException("Failed to send route message", e);
         }
         // Редактирование сообщения
-        messageHandler.editInlineKeyboardMessage("Выберите  категорию", KeyboardButton.InlineKeyboardChooseCategory, context);
+        messageHandler.updateInlineKeyboardMessage("Выберите  категорию", KeyboardButton.InlineKeyboardChooseCategory, context);
     }
 }
 

@@ -43,42 +43,54 @@ public class BotEngine extends TelegramLongPollingBot {
     public String getBotUsername() {
         return System.getProperty("botUsername");
     }
+
+    /**
+     * Выполняется всякий раз, когда получено обновление. Обрабатывает обновление асинхронно.
+     *
+     * @param update Обновление, полученное с сервера Telegram
+     */
     public void onUpdateReceived(Update update) {
-        if (!botRequests.offer(update)) {
-            System.err.println("Очередь запросов бота в настоящее время заполнена. Пожалуйста, повторите попытку позже.");
-        } else {
-            executorService.submit(() -> {
-                try {
-                    Update receivedUpdate = botRequests.take();
-                    processUpdate(receivedUpdate);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            });
-        }
+        executorService.submit(() -> processUpdate(update));
     }
 
+    /**
+     * Обрабатывает обновление
+     *
+     * @param update Полученное обновление
+     */
     private void processUpdate(Update update) {
-        String chatId;
-        if (update.hasMessage()) {
-            chatId = update.getMessage().getChatId().toString();
-        } else if (update.hasCallbackQuery()) {
-            chatId = update.getCallbackQuery().getMessage().getChatId().toString();
-        } else {
-            return;
-        }
-
+        String chatId = retrieveChatId(update);
+        if (chatId == null) return;
         ChatContext context = chatContextMap.computeIfAbsent(chatId, k -> new ChatContext(k, 0));
-
         if (update.hasMessage()) {
-            messageHandler.sendFirstMessage(update.getMessage(), context);
+            messageHandler.sendInitialMessage(update.getMessage(), context);
         }
         if (update.hasCallbackQuery()) {
             processCallbackQuery(update.getCallbackQuery(), context);
         }
     }
 
+    /**
+     * Извлекает идентификатор чата из объекта Update.
+     *
+     * @param update Полученное обновление
+     * @return String ChatId или null, если не найден
+     */
+    private String retrieveChatId(Update update){
+        if (update.hasMessage()) {
+            return update.getMessage().getChatId().toString();
+        } else if (update.hasCallbackQuery()) {
+            return update.getCallbackQuery().getMessage().getChatId().toString();
+        }
+        return null;
+    }
 
+    /**
+     * Обрабатывает CallbackQuery из обновления, если оно существует.
+     *
+     * @param callbackQuery Запрос обратного вызова из обновления
+     * @param context Контекст чата, связанный с идентификатором чата.
+     */
     private void processCallbackQuery(CallbackQuery callbackQuery, ChatContext context) {
         //Отправка кнопок в сообщениях
         if (callbackHandler.buttonHandlers.containsKey(callbackQuery.getData())) {
@@ -98,6 +110,12 @@ public class BotEngine extends TelegramLongPollingBot {
             callbackHandler.routeHandlers.get(callbackQuery.getData()).accept(callbackQuery.getData(), context);
         }
     }
+
+    /**
+     * Возвращает  экземпляр ChromeDriver.
+     *
+     * @return ChromeDriver
+     */
     public ChromeDriver getChromeDriver() {
         return chromeDriver;
     }

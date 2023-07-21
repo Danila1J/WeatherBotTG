@@ -14,38 +14,48 @@ import java.time.LocalTime;
 import java.util.Date;
 import java.util.Locale;
 
+/**
+ * Обрабатывает процесс получения и отображения расписания поездов.
+ */
 public class Schedule {
 
     private static final String API_URL = System.getProperty("SCHEDULE_API_URL");
     private static final String API_KEY = System.getProperty("SCHEDULE_API_KEY");
     private final Properties properties = Singleton.getInstance().getProperties();
 
-    public void train(String departureStation, String arrivalStation) throws TrainsNotFoundException {
-        String apiEndPoint = constructUrl(departureStation, arrivalStation, getCurrentDate());
+    /**
+     * Извлекает и обрабатывает расписание поездов на основе предоставленных станций.
+     *
+     * @param departureStation — станция отправления
+     * @param arrivalStation станция прибытия
+     * @throws TrainsNotFoundException, если поезда не найдены
+     */
+    public void fetchTrainSchedule(String departureStation, String arrivalStation) throws TrainsNotFoundException {
+        String apiEndPoint = buildUrl(departureStation, arrivalStation, getCurrentDate());
         StringBuilder responseBuilder = properties.getStr();
-
-        //Очищаем StringBuilder
-        responseBuilder.delete(0, responseBuilder.length());
-
-        //Получаем данные API
-        json.schedule.Root schedule = fetchTrainTimings(apiEndPoint);
-
-        parseSegments(schedule, responseBuilder);
-
-        //Электрички не найдены
-        if (responseBuilder.length() == 0) {
+        responseBuilder.delete(0, responseBuilder.length()); // Очищаем responseBuilder
+        json.schedule.Root schedule = getTrainTimings(apiEndPoint); // Получаем данные с помощью обращения к API
+        parseAndAppendSegments(schedule, responseBuilder);
+        if (responseBuilder.length() == 0) { // Электрички не найдены
             responseBuilder.append("Ближайших электричек на сегодня нет");
         }
-
         try {
             properties.setName_from(schedule.segments.get(0).from.title);
             properties.setName_to(schedule.segments.get(0).to.title);
-        }catch (IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             throw new TrainsNotFoundException();
         }
     }
 
-    private String constructUrl(String departureStation, String arrivalStation, String date) {
+    /**
+     * Создает URL для API расписания поездов.
+     *
+     * @param departureStation — станция отправления
+     * @param arrivalStation станция прибытия
+     * @param date дата, на которую нужно расписание
+     * @return построенная URL в виде строки
+     */
+    private String buildUrl(String departureStation, String arrivalStation, String date) {
         return Schedule.API_URL + Schedule.API_KEY + "&format=json"
                 + "&from=" + Dictionaries.cityCodeMap.get(departureStation)
                 + "&to=" + Dictionaries.cityCodeMap.get(arrivalStation)
@@ -54,11 +64,22 @@ public class Schedule {
                 + "&transport_types=suburban";
     }
 
+    /**
+     * Получает текущую дату.
+     *
+     * @return  текущую дату в виде строки
+     */
     private String getCurrentDate() {
         return new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
     }
 
-    private json.schedule.Root fetchTrainTimings(String apiEndPoint) {
+    /**
+     * Получает время поезда на основе предоставленной конечной точки API.
+     *
+     * @param apiEndPoint конечная точка API
+     * @return Корневой объект расписания
+     */
+    private json.schedule.Root getTrainTimings(String apiEndPoint) {
         try (InputStreamReader reader = new InputStreamReader(new URL(apiEndPoint).openStream())) {
             return new Gson().fromJson(reader, json.schedule.Root.class);
         } catch (IOException e) {
@@ -66,19 +87,37 @@ public class Schedule {
         }
     }
 
-    private void parseSegments(json.schedule.Root schedule, StringBuilder responseBuilder) {
+    /**
+     * Разбирает сегменты поезда и добавляет их к предоставленному StringBuilder.
+     *
+     * @param schedule расписание для разбора сегментов из
+     * @param responseBuilder — StringBuilder для добавления сведений о сегменте
+     */
+    private void parseAndAppendSegments(json.schedule.Root schedule, StringBuilder responseBuilder) {
         for (json.schedule.Segment segment : schedule.segments) {
-            if (shouldSkipSegment(segment)) {
+            if (isSegmentSkipped(segment)) {
                 continue;
             }
             appendSegmentDetails(segment, responseBuilder);
         }
     }
 
-    private boolean shouldSkipSegment(json.schedule.Segment segment) {
+    /**
+     * Определяет, следует ли пропускать определенный сегмент или нет.
+     *
+     * @param segment сегмент
+     * @return true, если сегмент следует пропустить, иначе false
+     */
+    private boolean isSegmentSkipped(json.schedule.Segment segment) {
         return LocalTime.parse(segment.departure.substring(11, 16)).isBefore(LocalTime.now());
     }
 
+    /**
+     * Добавляет сведения о конкретном сегменте к предоставленному StringBuilder.
+     *
+     * @param segment сегмент
+     * @param responseBuilder — StringBuilder для добавления сведений о сегменте к
+     */
     private void appendSegmentDetails(json.schedule.Segment segment, StringBuilder responseBuilder) {
         responseBuilder.append(segment.departure, 11, 16)
                 .append(" -> ")

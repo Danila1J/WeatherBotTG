@@ -36,7 +36,7 @@ public class MessageHandler {
      * @param message Входящее сообщение от пользователя.
      * @param context Контекст чата.
      */
-    public void sendFirstMessage(Message message, ChatContext context) {
+    public void sendInitialMessage(Message message, ChatContext context) {
         context.setChatId(message.getChatId().toString());
         SendMessage firstMessage = new SendMessage(message.getChatId().toString(), "Выберите  категорию");
         firstMessage.setReplyMarkup(KeyboardButton.InlineKeyboardChooseCategory);
@@ -54,7 +54,7 @@ public class MessageHandler {
      * @param messageId Идентификатор удаляемого сообщения.
      * @param context Контекст чата.
      */
-    public void deleteMessage(int delaySeconds, int messageId,ChatContext context) {
+    public void deleteMessageAfterDelay(int delaySeconds, int messageId, ChatContext context) {
         // Создает задачу для удаления сообщений после задержки
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.schedule(() -> {
@@ -76,7 +76,7 @@ public class MessageHandler {
      * @param inlineKeyboardMarkup InlineKeyboardMarkup для установки в сообщении.
      * @param context Контекст чата.
      */
-    public void editInlineKeyboardMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup, ChatContext context) {
+    public void updateInlineKeyboardMessage(String text, InlineKeyboardMarkup inlineKeyboardMarkup, ChatContext context) {
         EditMessageText editMessageText = new EditMessageText(text);
         editMessageText.setChatId(context.getChatId());
         editMessageText.setMessageId(context.getFirstMessageId());

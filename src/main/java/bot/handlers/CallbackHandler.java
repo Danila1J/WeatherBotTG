@@ -34,15 +34,23 @@ public class CallbackHandler {
         initButtonHandlers(messageHandler, scheduleHandler);
     }
 
-    // Инициализация обработчиков погоды, по городам
+    /**
+     * Инициализирует WeatherHandlers по городам.
+     *
+     * @param weatherHandler Экземпляр WeatherHandler для обработки отдельных городов.
+     */
     private void initCityWeatherHandlers(WeatherHandler weatherHandler) {
         cityWeatherHandlers.putAll(Map.of(
-                "WeatherSamara", weatherHandler::sendWeatherMessage,
-                "WeatherNovokybishevsk", weatherHandler::sendWeatherMessage
+                "WeatherSamara", weatherHandler::sendWeatherInfo,
+                "WeatherNovokybishevsk", weatherHandler::sendWeatherInfo
         ));
     }
 
-    // Инициализация обработчиков маршрутов
+    /**
+     * Инициализирует обработчики маршрутов.
+     *
+     * @param routeHandler Экземпляр RouteHandler для обработки маршрутов.
+     */
     private void initRouteHandlers(RouteHandler routeHandler) {
         routeHandlers.putAll(Map.of(
                 "Telecentre->Railway", routeHandler::sendTransportArrivalInfo,
@@ -50,26 +58,36 @@ public class CallbackHandler {
         ));
     }
 
-    // Инициализация обработчиков станций
+    /**
+     * Инициализирует обработчики прибытия.
+     *
+     * @param messageHandler Экземпляр MessageHandler для обработки сообщений.
+     */
     private void initArrivalStationsHandlers(MessageHandler messageHandler) {
         arrivalStationsHandlers.putAll(Map.of(
-                "FromSamara", context -> messageHandler.editInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalSamara, context),
-                "FromMirnaya", context -> messageHandler.editInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalMirnaya, context),
-                "FromLipyagi", context -> messageHandler.editInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalLipyagi, context),
-                "FromSrednevolzhskaya", context -> messageHandler.editInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalSrednevolzhskaya, context)
+                "FromSamara", context -> messageHandler.updateInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalSamara, context),
+                "FromMirnaya", context -> messageHandler.updateInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalMirnaya, context),
+                "FromLipyagi", context -> messageHandler.updateInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalLipyagi, context),
+                "FromSrednevolzhskaya", context -> messageHandler.updateInlineKeyboardMessage("Cтанция прибытия", KeyboardButton.InlineKeyboardChooseArrivalSrednevolzhskaya, context)
         ));
     }
 
-    // Инициализация обработчиков кнопок
+    /**
+     * Инициализирует обработчики кнопок.
+     *
+     * @param messageHandler Экземпляр MessageHandler для обработки сообщений.
+     * @param scheduleHandler Экземпляр ScheduleHandler для обработки расписания.
+     */
+    // TODO подумать над более корректным разделением кнопок по соответствующим Map
     private void initButtonHandlers(MessageHandler messageHandler, ScheduleHandler scheduleHandler) {
         buttonHandlers.putAll(Map.of(
-                "WeatherApp", context -> messageHandler.editInlineKeyboardMessage("Выберите город", KeyboardButton.InlineKeyboardChooseCity, context),
-                "Routes", context -> messageHandler.editInlineKeyboardMessage("Выберите маршрут", KeyboardButton.InlineKeyboardChooseRoutes, context),
-                "TabletimeFrom", context -> messageHandler.editInlineKeyboardMessage("Cтанция отправления", KeyboardButton.InlineKeyboardChooseDeparture, context),
-                "ToMirnaya", context -> scheduleHandler.sendSchedule(Singleton.getInstance().getProperties().getName_from(), "Мирная", context),
-                "ToSamara", context -> scheduleHandler.sendSchedule(Singleton.getInstance().getProperties().getName_from(), "Самара", context),
-                "ToLipyagi", context -> scheduleHandler.sendSchedule(Singleton.getInstance().getProperties().getName_from(), "Липяги", context),
-                "ToSrednevolzhskaya", context -> scheduleHandler.sendSchedule(Singleton.getInstance().getProperties().getName_from(), "Средневолжская", context)
+                "WeatherApp", context -> messageHandler.updateInlineKeyboardMessage("Выберите город", KeyboardButton.InlineKeyboardChooseCity, context),
+                "Routes", context -> messageHandler.updateInlineKeyboardMessage("Выберите маршрут", KeyboardButton.InlineKeyboardChooseRoutes, context),
+                "TabletimeFrom", context -> messageHandler.updateInlineKeyboardMessage("Cтанция отправления", KeyboardButton.InlineKeyboardChooseDeparture, context),
+                "ToMirnaya", context -> scheduleHandler.sendTrainSchedule(Singleton.getInstance().getProperties().getName_from(), "Мирная", context),
+                "ToSamara", context -> scheduleHandler.sendTrainSchedule(Singleton.getInstance().getProperties().getName_from(), "Самара", context),
+                "ToLipyagi", context -> scheduleHandler.sendTrainSchedule(Singleton.getInstance().getProperties().getName_from(), "Липяги", context),
+                "ToSrednevolzhskaya", context -> scheduleHandler.sendTrainSchedule(Singleton.getInstance().getProperties().getName_from(), "Средневолжская", context)
         ));
     }
 }
