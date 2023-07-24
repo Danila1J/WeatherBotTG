@@ -53,27 +53,25 @@ bash git clone https://github.com/Danila1J/WeatherBotTG.git cd WeatherBotTG mvn 
 Чтобы взаимодействовать с ботом, просто зайдите в чат и введите `/start` или нажмите кнопку «Старт».<br>
 Бот подскажет варианты. Выберите 1 из 3 категорий: «Погода», «Расписание поездов», «Маршруты».
 
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/f0ea00a6-0964-4be7-9f2e-64e553c0d2df" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/0e58a703-2293-437a-b642-b64308765cfa" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/871ee306-df76-4372-a754-e145faf7a42e" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/3c29fab2-a910-459b-a861-216ff9866dd0" width="250" height="500">
 
 В категории «Погода» выберите «Самара» или «Новокуйбышевск». Бот предоставит вам текущую и прогнозируемую погоду для выбранного города.
 
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/bb16f624-1182-4d4b-a923-4c8e78198dbd" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/8ce58e5f-99f7-4765-bebe-74b110527ef2" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/0c17375c-056b-400c-9c8b-48df88788424" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/9ea03597-3d27-4568-9420-390841619044" width="250" height="500">
 
 В категории «Расписание электричек» выберите станцию отправления, а затем выберите станцию назначения. Бот предоставит вам расписание поездов между выбранными станциями.
 
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/8c75b51d-e2d9-4690-8cb3-0edd0c98e170" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/6ddc013e-f9d7-450c-a489-166bc76443d4" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/ee407724-357f-4e7c-919c-708846c9d549" width="250" height="500">
-
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/ac4746b0-b2cc-49ef-9319-5cb46145007b" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/c964d7ea-8461-494b-94a8-e05e7f50b0c7" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/c38909e1-2138-4ed3-9472-17554d41438e" width="250" height="500">
 
 В категории «Маршруты» выберите свой маршрут, и бот предоставит вам данные о прибытии автобусов или троллейбусов в режиме реального времени. Сообщение обновляется каждые 30 секунд в течение 10 минут.
 
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/d1a89184-d463-42b5-9a99-90e0fb7c089a" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/589fca23-92e0-47d7-9eca-3d3bc2db6689" width="250" height="500">
-<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/d76b172a-b777-4cb7-af6b-0dc0aa887cf5" width="250" height="500">
-
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/eb81508f-78ca-40c4-ba57-70f70e5ac123" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/6b552f93-0351-44e8-8d16-1ce345244b30" width="250" height="500">
+<img src="https://github.com/Danila1J/WeatherBotTG/assets/42370968/606aab9d-95bc-45fe-a32c-d62518996e7d" width="250" height="500">
 
 ### Содействие
 
