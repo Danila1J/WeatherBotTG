@@ -37,6 +37,7 @@ public class BotEngine extends TelegramLongPollingBot {
         ScheduleHandler scheduleHandler = new ScheduleHandler(this, messageHandler);
         RouteHandler routeHandler = new RouteHandler(this, messageHandler);
         this.callbackHandler = new CallbackHandler(messageHandler, weatherHandler, routeHandler, scheduleHandler);
+        Runtime.getRuntime().addShutdownHook(new Thread(chromeDriver::quit));
     }
 
     @Override

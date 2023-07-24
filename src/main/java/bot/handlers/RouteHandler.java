@@ -54,6 +54,7 @@ public class RouteHandler {
         } catch (ElementNotFoundException e) {
             routeDetails.setLength(0); // Удаление названия маршрута, так как по направлению нет транспорта
             sendThenDeleteMessage("На выбранном маршруте нет транспорта", context, 60);
+            messageHandler.updateInlineKeyboardMessage("Выберите  категорию", KeyboardButton.InlineKeyboardChooseCategory, context);
         }
     }
 

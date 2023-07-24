@@ -7,31 +7,18 @@ import pages.MainPage;
 import pages.samara.ArrivingTransportPage;
 
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Класс Routes хранит информацию о маршрутах и обеспечивает методы для их получения.
  */
 public class Routes {
 
-    private static final Map<Character, String> ROUTE_URLS = new HashMap<>();
-    private final int AMOUNT_TRANSPORT = 5;
-
-
-    static {
-        setupRouteUrls();
-    }
-
-    /**
-     * Заполняет map URL-ами страниц для каждой остановки.
-     */
-    private static void setupRouteUrls() {
-        ROUTE_URLS.putAll(Map.of(
-                'T', System.getProperty("Telecentre->Railway.url"),
-                'R', System.getProperty("Railway->Telecentre.url")
-        ));
-    }
+    private static final Map<Character, String> ROUTE_URLS =
+            Map.of(
+                    'T', System.getProperty("Telecentre->Railway.url"),
+                    'R', System.getProperty("Railway->Telecentre.url")
+            );
 
     /**
      * Устанавливает драйвер для AbstractPage, и время ожидания для поиска элементов.
@@ -69,19 +56,7 @@ public class Routes {
         MainPage mainPage = new MainPage();
         ArrivingTransportPage arrivingTransportPage = mainPage.gotoArrivingTransports();
 
-        StringBuilder[] routesInfo = fetchRoutesInfo(AMOUNT_TRANSPORT, arrivingTransportPage);
-
-        // Инициирование нового потока для закрытия драйвера через 10 минут
-        new Thread(() -> {
-            try {
-                Thread.sleep(600000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            driver.quit();
-        }).start();
-
-        return routesInfo;
+        return fetchRoutesInfo(arrivingTransportPage.getAmount(), arrivingTransportPage);
     }
 
     /**
@@ -106,24 +81,30 @@ public class Routes {
      * @throws ElementNotFoundException
      */
     private StringBuilder[] fetchRoutesInfo(int amount, ArrivingTransportPage arrivingTransportPage) throws ElementNotFoundException {
-        StringBuilder[] answer = new StringBuilder[amount];
+        StringBuilder[] routes = new StringBuilder[amount];
+        Set<String> numbersToSkip = new HashSet<>(Arrays.asList("19", "23", "47", "170"));
+
         int j = 0;
-        for (int i = 0; j < amount; i++) {
-            String name = arrivingTransportPage.getNameText(i + 1);
-            if (name.equals("19") || name.equals("23") || name.equals("47") || name.equals("170")) {
-                continue;
+        for (int i = 1; j < amount; i++) {
+            String nameRoute = arrivingTransportPage.getNumberRouteText(i);
+            if (numbersToSkip.contains(nameRoute)) continue;
+            routes[j] = new StringBuilder();
+
+            String type = arrivingTransportPage.getTypeText(i);
+
+            if (type.startsWith("trans-trol")) {
+                routes[j].append("Т\uD83D\uDE8E ").append(nameRoute);
+            } else if (type.startsWith("trans-bus")) {
+                routes[j].append("А\uD83D\uDE8C ").append(nameRoute);
             }
-            answer[j] = new StringBuilder();
-            switch (arrivingTransportPage.getTypeText(i + 1)) {
-                case "trans-trol " -> answer[j].append("Т\uD83D\uDE8E ").append(name);
-                case "trans-bus " -> answer[j].append("А\uD83D\uDE8C ").append(name);
-            }
-            String time = arrivingTransportPage.getTimeText(i + 1);
-            answer[j].append(" (").append(time).append(declineMinutes(Integer.parseInt(time))).append(")").append("\n\n");
+
+            String time = arrivingTransportPage.getTimeText(i);
+            routes[j].append(" (").append(time).append(declineMinutes(Integer.parseInt(time))).append(")").append("\n\n");
             j++;
         }
-        return answer;
+        return routes;
     }
+
 
     /**
      * Склоняет слово «минут».
