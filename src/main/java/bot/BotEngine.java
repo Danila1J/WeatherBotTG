@@ -9,7 +9,10 @@ import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static bot.service.Dictionaries.arrivalStationMap;
 import static bot.service.Dictionaries.translatedCitiesMap;
@@ -20,12 +23,14 @@ import static bot.service.Dictionaries.translatedCitiesMap;
 public class BotEngine extends TelegramLongPollingBot {
 
     private final Map<String, ChatContext> chatContextMap = new ConcurrentHashMap<>();
-    private final BlockingQueue<Update> botRequests = new ArrayBlockingQueue<>(100);
     private final ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     private final MessageHandler messageHandler;
+    private final MedicinesHandler medicinesHandler;
     private final CallbackHandler callbackHandler;
+    //private final ChromeDriver chromeDriver = new ChromeDriver(new ChromeOptions().addArguments("headless"));
     private final ChromeDriver chromeDriver = new ChromeDriver(new ChromeOptions().addArguments("headless"));
+    private final ChromeDriver chromeDriverMed = new ChromeDriver(new ChromeOptions());
 
     /**
      * Создает новый экземпляр BotEngine. Инициализируя все handlers
@@ -36,7 +41,8 @@ public class BotEngine extends TelegramLongPollingBot {
         WeatherHandler weatherHandler = new WeatherHandler(this, messageHandler);
         ScheduleHandler scheduleHandler = new ScheduleHandler(this, messageHandler);
         RouteHandler routeHandler = new RouteHandler(this, messageHandler);
-        this.callbackHandler = new CallbackHandler(messageHandler, weatherHandler, routeHandler, scheduleHandler);
+        this.medicinesHandler = new MedicinesHandler(this, messageHandler, chromeDriverMed);
+        this.callbackHandler = new CallbackHandler(messageHandler, weatherHandler, routeHandler, scheduleHandler, medicinesHandler);
         Runtime.getRuntime().addShutdownHook(new Thread(chromeDriver::quit));
     }
 
@@ -63,11 +69,14 @@ public class BotEngine extends TelegramLongPollingBot {
         String chatId = retrieveChatId(update);
         if (chatId == null) return;
         ChatContext context = chatContextMap.computeIfAbsent(chatId, k -> new ChatContext(k, 0));
-        if (update.hasMessage()) {
+        if (update.hasMessage() && Objects.equals(update.getMessage().getText(), "/start")) {
             messageHandler.sendInitialMessage(update.getMessage(), context);
         }
         if (update.hasCallbackQuery()) {
             processCallbackQuery(update.getCallbackQuery(), context);
+        }
+        if (update.hasMessage() && !Objects.equals(update.getMessage().getText(), "/start")) {
+            medicinesHandler.sendButtonReleaseForm(update.getMessage().getText(), context);
         }
     }
 
@@ -77,7 +86,7 @@ public class BotEngine extends TelegramLongPollingBot {
      * @param update Полученное обновление
      * @return String ChatId или null, если не найден
      */
-    private String retrieveChatId(Update update){
+    private String retrieveChatId(Update update) {
         if (update.hasMessage()) {
             return update.getMessage().getChatId().toString();
         } else if (update.hasCallbackQuery()) {
@@ -90,7 +99,7 @@ public class BotEngine extends TelegramLongPollingBot {
      * Обрабатывает CallbackQuery из обновления, если оно существует.
      *
      * @param callbackQuery Запрос обратного вызова из обновления
-     * @param context Контекст чата, связанный с идентификатором чата.
+     * @param context       Контекст чата, связанный с идентификатором чата.
      */
     private void processCallbackQuery(CallbackQuery callbackQuery, ChatContext context) {
         //Отправка кнопок в сообщениях
@@ -109,6 +118,14 @@ public class BotEngine extends TelegramLongPollingBot {
         //Маршруты
         if (callbackHandler.routeHandlers.containsKey(callbackQuery.getData())) {
             callbackHandler.routeHandlers.get(callbackQuery.getData()).accept(callbackQuery.getData(), context);
+        }
+        //Форма выпуска лекарст
+        if (callbackHandler.medicinesReleaseFormHandlers.containsKey(callbackQuery.getData())) {
+            callbackHandler.medicinesReleaseFormHandlers.get(callbackQuery.getData()).accept(callbackQuery.getData(), context);
+        }
+        //Выбор лекарства
+        if (callbackHandler.selectMedicinesHandlers.containsKey(callbackQuery.getData())) {
+            callbackHandler.selectMedicinesHandlers.get(callbackQuery.getData()).accept(callbackQuery.getData(), context);
         }
     }
 

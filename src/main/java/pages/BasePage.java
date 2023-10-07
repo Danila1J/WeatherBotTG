@@ -1,5 +1,6 @@
 package pages;
 
+import pages.all.apteki.FindMedicinesPage;
 import pages.samara.ArrivingTransportPage;
 import pages.yandex.weather.YandexWeatherPage;
 

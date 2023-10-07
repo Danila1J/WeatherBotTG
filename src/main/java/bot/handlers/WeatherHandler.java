@@ -56,7 +56,7 @@ public class WeatherHandler {
                 .append("Сейчас на улице ").append(Singleton.getInstance().getProperties().getCondition())
                 .append("\nТемпература в ").append(Dictionaries.declinationCityMap.get(cityName)).append(": ").append(Math.round(Singleton.getInstance().getProperties().getTempOfCity()))
                 .append(" °C\nВетер ").append(Singleton.getInstance().getProperties().getWind()).append(" м/с")
-                .append(constructWeatherInfoString(Singleton.getInstance().getProperties().getS())).append("\n\n")
+                .append(constructWeatherInfoString(Singleton.getInstance().getProperties().getStringWeatherPartDay())).append("\n\n")
                 .append(Singleton.getInstance().getProperties().getWeatherMessage())
                 .toString();
     }

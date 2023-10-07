@@ -47,6 +47,18 @@ public class MessageHandler {
         }
     }
 
+    public void sendMessage(String text, ChatContext context) {
+        SendMessage textMessage = new SendMessage(context.getChatId().toString(), text);
+        //firstMessage.setReplyMarkup(KeyboardButton.InlineKeyboardChooseCategory);
+        try {
+           botEngine.execute(textMessage).getMessageId();
+        } catch (TelegramApiException e) {
+            throw new RuntimeException("Failed to send first message",e);
+        }
+    }
+
+
+
     /**
      * Удаление сообщения после определенной задержки.
      *

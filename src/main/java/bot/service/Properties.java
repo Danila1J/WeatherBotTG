@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Properties {
-    public StringBuilder getStr() {
-        return str;
+    public StringBuilder getStringSchedule() {
+        return stringSchedule;
     }
+    private final StringBuilder stringSchedule = new StringBuilder();    //Строка расписания
 
-    private final StringBuilder str = new StringBuilder();    //Строка расписания
-
-    private List<String> s = new ArrayList<>();
+    private List<String> stringWeatherPartDay = new ArrayList<>();
 
     private String name_from;
     private String name_to;
@@ -155,12 +154,12 @@ public class Properties {
         this.weatherMessage = weatherMessage;
     }
 
-    public List<String> getS() {
-        return s;
+    public List<String> getStringWeatherPartDay() {
+        return stringWeatherPartDay;
     }
 
-    public void setS(List<String> s) {
-        this.s = s;
+    public void setStringWeatherPartDay(List<String> stringWeatherPartDay) {
+        this.stringWeatherPartDay = stringWeatherPartDay;
     }
 }
 

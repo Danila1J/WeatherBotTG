@@ -57,8 +57,8 @@ public class ScheduleHandler {
      * @throws TrainsNotFoundException Если поезда по заданному маршруту не найдены.
      */
     private String createScheduleMessage(String departureStation, String destinationStation) throws TrainsNotFoundException {
-        new Schedule().fetchTrainSchedule(departureStation, destinationStation);
-        return "Расписание " + departureStation + "🚂 - " + destinationStation + "🚂\n\n" + Singleton.getInstance().getProperties().getStr();
+        new Schedule(Singleton.getInstance()).fetchTrainSchedule(departureStation, destinationStation);
+        return "Расписание " + departureStation + "🚂 - " + destinationStation + "🚂\n\n" + Singleton.getInstance().getProperties().getStringSchedule();
     }
 
     /**

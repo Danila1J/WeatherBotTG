@@ -21,7 +21,17 @@ public class Schedule {
 
     private static final String API_URL = System.getProperty("SCHEDULE_API_URL");
     private static final String API_KEY = System.getProperty("SCHEDULE_API_KEY");
-    private final Properties properties = Singleton.getInstance().getProperties();
+    private final Properties properties;
+
+    /**
+     * Создает новый экземпляр расписания.
+     * В данном случае он принимает объект Singleton в качестве параметра и получает его свойства, необходимые для работы этого класса Schedule.
+     *
+     * @param instance Экземпляр класса Singleton, из которого должны быть извлечены свойства.
+     */
+    public Schedule(Singleton instance) {
+        this.properties = instance.getProperties();
+    }
 
     /**
      * Извлекает и обрабатывает расписание поездов на основе предоставленных станций.
@@ -32,7 +42,7 @@ public class Schedule {
      */
     public void fetchTrainSchedule(String departureStation, String arrivalStation) throws TrainsNotFoundException {
         String apiEndPoint = buildUrl(departureStation, arrivalStation, getCurrentDate());
-        StringBuilder responseBuilder = properties.getStr();
+        StringBuilder responseBuilder = properties.getStringSchedule();
         responseBuilder.delete(0, responseBuilder.length()); // Очищаем responseBuilder
         json.schedule.Root schedule = getTrainTimings(apiEndPoint); // Получаем данные с помощью обращения к API
         parseAndAppendSegments(schedule, responseBuilder);

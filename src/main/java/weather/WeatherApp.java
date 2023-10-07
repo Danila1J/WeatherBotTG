@@ -73,7 +73,7 @@ public class WeatherApp {
      * @param weatherData данные о погоде для извлечения свойств
      */
     private static void clearAndSetWeatherProperties(Root weatherData) {
-        properties.getS().clear();
+        properties.getStringWeatherPartDay().clear();
         setWeatherProperties(weatherData);
         setWeatherConditionPartsProperties(weatherData);
     }
@@ -110,22 +110,22 @@ public class WeatherApp {
             case "morning" -> {
                 properties.setMorning_t(part.temp_avg);
                 properties.setMorning_cond(Dictionaries.conditionMap.get(part.condition));
-                properties.getS().add(part.part_name);
+                properties.getStringWeatherPartDay().add(part.part_name);
             }
             case "day" -> {
                 properties.setDay_t(part.temp_avg);
                 properties.setDay_cond(Dictionaries.conditionMap.get(part.condition));
-                properties.getS().add(part.part_name);
+                properties.getStringWeatherPartDay().add(part.part_name);
             }
             case "evening" -> {
                 properties.setEvening_t(part.temp_avg);
                 properties.setEvening_cond(Dictionaries.conditionMap.get(part.condition));
-                properties.getS().add(part.part_name);
+                properties.getStringWeatherPartDay().add(part.part_name);
             }
             case "night" -> {
                 properties.setNight_t(part.temp_avg);
                 properties.setNight_cond(Dictionaries.conditionMap.get(part.condition));
-                properties.getS().add(part.part_name);
+                properties.getStringWeatherPartDay().add(part.part_name);
             }
         }
     }
